@@ -1,0 +1,28 @@
+---
+config:
+  layout: elk
+---
+flowchart TB
+    User(["User"]) -- interacts --> Frontend["Frontend"]
+    Admin(["Lab Manager"]) -- manages --> Frontend
+    Frontend -- publish commands --> Broker{"Message Broker<br>RabbitMQ · NATS · SQS"}
+    Broker -- subscribe --> W_Prov["Provisioning Worker×N"] & W_Deprov["Deprovision Worker×N"] & W_Notify["Notification Worker×N"] & W_Day1["Day One Worker×N"] & W_Day2["Day Two Worker×N"] & W_DB["DB Writer<br>Single Instance"]
+    W_Prov -. publish result .-> Broker
+    W_Deprov -. publish result .-> Broker
+    W_Notify -. publish result .-> Broker
+    W_Day1 -. publish result .-> Broker
+    W_Day2 -. publish result .-> Broker
+    W_DB == write ==> DB[("Postgres DB<br>Source of Truth")]
+    DB -. "read-only" .-> Frontend
+
+    style User fill:#FFE0B2
+    style Frontend fill:#BBDEFB
+    style Admin fill:#FFE0B2
+    style Broker fill:#E1BEE7
+    style W_Prov fill:#C8E6C9
+    style W_Deprov fill:#FFCDD2
+    style W_Notify fill:#FFF9C4
+    style W_Day1 fill:#C8E6C9
+    style W_Day2 fill:#C8E6C9
+    style W_DB fill:#FFCDD2
+    style DB fill:#FFCDD2
